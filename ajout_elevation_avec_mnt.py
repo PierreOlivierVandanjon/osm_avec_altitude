@@ -17,6 +17,8 @@ hypothèses
     
 Amélioration 
 
+    L'algorithme pour trouver le bon modèle numérique de terrain qui correspond au point de carte openstreetmap inspecté a été fait à l'intuition. Cela demande une vérification
+
     Le cas où un point de la carte openstreemap se situe entre deux fichiers modèle numérique de terrains n'est pas géré
     
     l'algorithme affiche pour quelques point "il y a un problème sur les xllcorner et les yllcorne par rapport au x et y", ces points sont à analyser, ils doivent correspondre à des points qui sont entre deux cartes numériques de terrain
@@ -48,6 +50,11 @@ file_output=file_territoire.replace(".","_avec_elevation_mnt.")
 constantes globale
 chemin_mnt : chemin dans lequel se trouve les modèles numériques de terrain
 wgs_to_lambert93 : 
+Utilisation de pyproj 1.4
+epsg:4326 correspond au WGS84
+epsg:2154 correspon au Lambert93
+selon
+https://spatialreference.org/
 """
 chemin_mnt="data//"
 wgs_to_lambert93 = Transformer.from_crs("epsg:4326","epsg:2154")
@@ -102,9 +109,9 @@ Out[20]: 101.70000000000002
 """
 Variables globales
 """
-fichiers_charges=[]
-fichiers_manquants=[]
-liste_entetes=[]
+fichiers_charges=[] # liste des MNT chargés en mémoire
+fichiers_manquants=[] # listes des MNT qui manquent
+liste_entetes=[] 
 liste_altis=[]
 
 def get_alti(lat,lon):
@@ -114,6 +121,9 @@ def get_alti(lat,lon):
             x=(longueur-len(x))*'0'+x
         return x
     def projet_carre(nc,nl): # projette les distances du point  dans le carré de la matrice raster du modèle numérique du terrain et signale un problème sinon 
+        # sortie
+        # -1 si il y a un problèùe
+        # l'indice de la colonne, la distance comprise entre 0 et 1 entre la colonne et le point, idem pour les lignes
         delta=0.0001        
         if nc<=0:
             if nc<=-1:
@@ -143,7 +153,9 @@ def get_alti(lat,lon):
         ncf,nlf=math.ceil(nc), math.ceil(nl)
         nci,nli=math.floor(nc), math.floor(nl)
         return nci, ncf-nc, ncf, nc-nci, nli, nlf-nl, nlf, nl-nli
-    x,y=wgs_to_lambert93.transform(lat,lon)
+    # Fin de la fonction projette
+    x,y=wgs_to_lambert93.transform(lat,lon) 
+    # Trouver le bon modèle numérique de terrain, ceci est à vérifier
     len_nom=4
     X=complete(str(math.floor(x/1000)),len_nom)
     Y=complete(str(math.ceil(y/1000)),len_nom)
