@@ -4,10 +4,10 @@ Pierre-Olivier Vandanjon
 2 avril 2021
 en test
 
-Ce script entrée une carte openstreemat
+Ce script prende en entrée une carte openstreetmat
 sortie : 
-    carte openstreetmat avec élévation issue des modèles numériques de terrain 
-    disponivles sur le site geoportail en libre depuis le 1er janvier 2021
+    carte openstreetmat avec altitudes issues des modèles numériques de terrain 
+    disponibles sur le site geoportail en libre depuis le 1er janvier 2021
     et utiliser les données libres depuis le 1er janvier 2021
 https://geoservices.ign.fr/documentation/diffusion/telechargement-donnees-libres.html
 https://geoservices.ign.fr/documentation/diffusion/telechargement-donnees-libres.html#rge-alti-1-m
@@ -16,13 +16,21 @@ hypothèses
     les altitudes sont positives
     
 Amélioration 
+
+    Le cas où un point de la carte openstreemap se situe entre deux fichiers modèle numérique de terrains n'est pas géré
+    
+    l'algorithme affiche pour quelques point "il y a un problème sur les xllcorner et les yllcorne par rapport au x et y", ces points sont à analyser, ils doivent correspondre à des points qui sont entre deux cartes numériques de terrain
+    
     Il manque des fichiers de modèle numérique de terrains, dans ce cas, on ne met pas de champs ele
-    voir la listes fichiers_manquants
+    voir la listes fichiers_manquant. Ces points doivent se situer en Loire Atlantique. 
 
-   La formule pour calculer l'altitude n'est pas terrible 
-       car si on est sur un point nous ne donnons pas la valeur de ce point 
-       il faut faire une fonction mieux adaptée
-
+   La formule pour calculer l'altitude est à vérifier, il n'y a pas eu des tests unitaires sur cette partie.
+   
+   Un test à effectuer en comparant le  profil sur une ligne droite calculée par Géoportail et le profil fourni vu sur netedit. Cela semble fonctionner qualitativement. Il faut réfléchir à un teste quantitatif.
+   
+   Transformer ce script en fonction
+   
+   
 """
 import math
 import numpy as np
@@ -101,11 +109,11 @@ liste_altis=[]
 
 def get_alti(lat,lon):
     global fichiers_charges, liste_altis, liste_entetes, fichiers_manquants
-    def complete(x,longueur):
+    def complete(x,longueur): # fonction utilitaire ajoutant des 0 devant une chaine de caractère
         if len(x)<longueur:
             x=(longueur-len(x))*'0'+x
         return x
-    def projet_carre(nc,nl): # projette les indices dans le carré de la matrice et signale un problème sinon 
+    def projet_carre(nc,nl): # projette les distances du point  dans le carré de la matrice raster du modèle numérique du terrain et signale un problème sinon 
         delta=0.0001        
         if nc<=0:
             if nc<=-1:
