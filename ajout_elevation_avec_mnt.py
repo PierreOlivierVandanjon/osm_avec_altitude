@@ -30,6 +30,9 @@ Amélioration
    
    Un test à effectuer en comparant le  profil sur une ligne droite calculée par Géoportail et le profil fourni vu sur netedit. Cela semble fonctionner qualitativement. Il faut réfléchir à un teste quantitatif.
    
+    return (altis[-nli-1, nci]*coef_nci*coef_nli+ altis[-nli-1, ncf]*coef_ncf*coef_nli+ altis[-nlf-1, nci]*coef_nci*coef_nlf+ altis[-nlf-1, ncf] *coef_ncf*coef_nlf)/\
+    (coef_nci*coef_nli+coef_ncf*coef_nli+coef_nci*coef_nlf+coef_ncf*coef_nlf) # le dénominateur vaut 1 ! A vérifier et simplifier
+   
    Transformer ce script en fonction
    
    
@@ -123,7 +126,7 @@ def get_alti(lat,lon):
     def projet_carre(nc,nl): # projette les distances du point  dans le carré de la matrice raster du modèle numérique du terrain et signale un problème sinon 
         # sortie
         # -1 si il y a un problèùe
-        # l'indice de la colonne, la distance comprise entre 0 et 1 entre la colonne et le point, idem pour les lignes
+        # l'indice de la colonne inférieur, le coefficient affecté à la colonne inférieure, l'indice de la colonne supérieur, le coefficient affecté à cette colonnne, idem pour les lignes
         delta=0.0001        
         if nc<=0:
             if nc<=-1:
@@ -184,7 +187,7 @@ def get_alti(lat,lon):
         return -1 # 
     
     return (altis[-nli-1, nci]*coef_nci*coef_nli+ altis[-nli-1, ncf]*coef_ncf*coef_nli+ altis[-nlf-1, nci]*coef_nci*coef_nlf+ altis[-nlf-1, ncf] *coef_ncf*coef_nlf)/\
-    (coef_nci*coef_nli+coef_ncf*coef_nli+coef_nci*coef_nlf+coef_ncf*coef_nlf)
+    (coef_nci*coef_nli+coef_ncf*coef_nli+coef_nci*coef_nlf+coef_ncf*coef_nlf) # le dénominateur vaut 1 ! A vérifier et simplifier
     
     
 
